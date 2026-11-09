@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.manas</groupId>
+    <artifactId>governed-lakehouse-ingestion</artifactId>
+    <version>1.0.0</version>
+    <name>governed-lakehouse-ingestion</name>
+    <description>Governed lakehouse ingestion: schema contracts, quarantine, column lineage, Kotlin on Spark and Iceberg</description>
+    <packaging>jar</packaging>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <kotlin.version>2.0.20</kotlin.version>
+        <spark.version>4.0.5</spark.version>
+        <iceberg.version>1.12.0</iceberg.version>
+        <scala.binary.version>2.13</scala.binary.version>
+        <!-- The 1,000,000-row volume run and the 48-violation seeded suite are tagged
+             "benchmark" and excluded from the default `mvn test`. Run them explicitly with:
+             mvn test -Dtest=VolumeBenchmarkRunner -Dsurefire.excludedGroups= -->
+        <surefire.excludedGroups>benchmark</surefire.excludedGroups>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-sql_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.iceberg</groupId>
+            <artifactId>iceberg-spark-runtime-4.0_${scala.binary.version}</artifactId>
+            <version>${iceberg.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+        <!-- Embedded Kafka broker (KRaft, no Zookeeper) for the real-Kafka ingestion path's
+             own integration test; the precedent for embedded Kafka in this portfolio is
+             mainframe-cdc-continuous-reconciliation and self-service-kafka-topic-platform. -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-server-common</artifactId>
+            <version>3.8.0</version>
+            <classifier>test</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-metadata</artifactId>
+            <version>3.8.0</version>
+            <classifier>test</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_${scala.binary.version}</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_${scala.binary.version}</artifactId>
+            <version>3.8.0</version>
+            <classifier>test</classifier>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-junit5</artifactId>
+            <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.11.3</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals><goal>compile</goal></goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals><goal>test-compile</goal></goals>
+                        <configuration>
+                            <sourceDirs>
+                                <sourceDir>${project.basedir}/src/test/kotlin</sourceDir>
+                            </sourceDirs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmTarget>21</jvmTarget>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <excludedGroups>${surefire.excludedGroups}</excludedGroups>
+                    <!-- Spark's codegen needs reflective access to a few JDK-internal
+                         classes (java.util.calendar.ZoneInfo for date decoding being the
+                         one this project actually hits); without these the JPMS module
+                         system blocks it with IllegalAccessException. See README's
+                         "Honest framing". -->
+                    <argLine>
+                        --add-opens=java.base/java.lang=ALL-UNNAMED
+                        --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+                        --add-opens=java.base/java.util=ALL-UNNAMED
+                        --add-opens=java.base/sun.util.calendar=ALL-UNNAMED
+                        --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

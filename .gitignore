@@ -1,0 +1,8 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+spark-warehouse/
+metastore_db/
+derby.log

@@ -1,0 +1,2 @@
+Seeded violation benchmark: 48 / 48 seeded violations caught with exact feed/row/column
+Total quarantine rows: 48 (expect exactly 48, no false positives)

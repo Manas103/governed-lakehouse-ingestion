@@ -1,0 +1,10 @@
+pos_custodian_bny: 170000 rows, 169915 admitted, 85 quarantined (seeded 85), 0 re-check violations after harmonization
+pos_custodian_statetrust: 170000 rows, 169915 admitted, 85 quarantined (seeded 85), 0 re-check violations after harmonization
+cash_bank_x: 165000 rows, 164918 admitted, 82 quarantined (seeded 82), 0 re-check violations after harmonization
+cash_bank_y: 165000 rows, 164918 admitted, 82 quarantined (seeded 82), 0 re-check violations after harmonization
+nav_admin_p: 165000 rows, 164918 admitted, 82 quarantined (seeded 82), 0 re-check violations after harmonization
+nav_admin_q: 165000 rows, 164918 admitted, 82 quarantined (seeded 82), 0 re-check violations after harmonization
+
+Total: 1000000 rows, 999502 admitted, 498 quarantined, 498 seeded
+Run time: 20741ms
+Contract-violating rows admitted: 0 (target 0)
